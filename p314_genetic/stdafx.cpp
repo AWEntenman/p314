@@ -7,12 +7,13 @@
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
 
-/* crt_qsort.c
+/*
+//crt_qsort.c
 // arguments: every good boy deserves favor
 
 // This program reads the command-line
-* parameters and uses qsort to sort them. It
-* then displays the sorted arguments.
+// parameters and uses qsort to sort them. It
+// then displays the sorted arguments.
 
 
 int compare(const void *arg1, const void *arg2);
