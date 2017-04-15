@@ -7,7 +7,7 @@
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
 
-/*
+
 //crt_qsort.c
 // arguments: every good boy deserves favor
 
@@ -15,11 +15,12 @@
 // parameters and uses qsort to sort them. It
 // then displays the sorted arguments.
 
-
+/*
 int compare(const void *arg1, const void *arg2);
 
 int main(int argc, char **argv)
 {
+	std::cout << "argv >:" << argv[2] << ":<\n";
 int i;
 //Eliminate argv[0] from sort:
 argv++;
