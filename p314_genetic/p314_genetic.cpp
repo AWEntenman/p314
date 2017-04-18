@@ -5,14 +5,14 @@
 
 using namespace std;
 
-const int ggen_size = 10;
+const int ggen_size = 30000;
 const int ggen_indx = 19;
 
 struct gen314 {
 	double opt;
 	unsigned short xy[ggen_indx];
 } ggen[ggen_size] = {
-	{{ 130.11 },{ 0, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,25 }},
+	{{ 130.11 },{ 0, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 }},
 	{{ 132.15 },{ 0,21,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,61 }},
 	{{ 132.55 },{ 0,31,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,02 }},
 	{{ 132.19 },{ 0,41,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,11 }},
@@ -23,9 +23,16 @@ struct gen314 {
 
 int compareD(const void *i, const void *j) {
 	double a, b;
-	a = * (double *) i;
-	b = * (double *) j;
-	return (int)(a - b);
+	a = *(double *)i;
+	b = *(double *)j;
+	if (a>=b)
+	{
+		return -1;
+	}
+	else
+	{
+		return 1;
+	}
 }
 
 int compareI(const void *i, const void *j) {
@@ -35,42 +42,65 @@ int compareI(const void *i, const void *j) {
 	return (int)(a - b);
 }
 
-
 int main()
 {
-	int x1[2*ggen_indx];
-
 	for (; ;)
 	{
-		//populate ggen
-		int t1[ggen_indx];
-		for (int j = 0; j < ggen_size; j++)
-		{
-			t1[0] = pr8() / 2;
-			for (int i = 1; i < ggen_indx; i++)
-			{
-				t1[i] = pr8() + t1[i - 1];
-			}
-			for (int i = 0; i < ggen_indx; i++)
-			{
-				t1[i] = t1[i] * xyList;
-				t1[i] = t1[i] / t1[ggen_indx - 1];
-			}
-			copy(begin(t1), end(t1), begin(ggen[j].xy));
-		}
-
-		//compute the area/perimeter ratio
+		//compute the area/perimeter ratio for all edges
 		for (int i = 0; i < ggen_size; i++)
 		{
-			
-
-
-			ggen[i].opt = sqrt(1.35)*(double)pr8();
+			//populate ggen
+			int t1[ggen_indx];
+			for (int j = 0; j < ggen_size; j++)
+			{
+				//t1[0] = pr8() / 2;
+				for (int k = 0; k < 7; k++)
+				{
+					t1[k] = pr8()/3 + t1[k - 1];
+				}
+				for (int k = 7; k < ggen_indx; k++)
+				{
+					t1[k] = pr8() + t1[k - 1];
+				}
+				for (int k = 0; k < ggen_indx; k++)
+				{
+					t1[k] = t1[k] * (xyList - 1);
+					t1[k] = t1[k] / t1[ggen_indx - 1];
+				}
+			}
+			copy(begin(t1), end(t1), begin(ggen[i].xy));
+			//Build the coefficient list
+			int t2[2 * ggen_indx];
+			for (int j = 1; j < ggen_indx; j++)
+			{
+				t2[j] = xy[t1[j-1]][0];
+				t2[2 * ggen_indx - 1 - j] = xy[t1[j-1]][1];
+			}
+			t2[0] = 0;
+			t2[2 * ggen_indx - 2] = 250;
+			t2[2 * ggen_indx - 1] = 250;
+			//compute the objective function
+			double a = 0;
+			for (int j = 0; j < 2*ggen_indx-2; j++)
+			{
+				a += (t2[j + 1] - t2[j])*(t2[2*ggen_indx-1-j] + t2[2*ggen_indx-2-j]);
+			}
+			a /= 2;
+			double ll = 0;
+			for (int j = 0; j < ggen_indx-1; j++)
+			{
+				ll += sqrt((t2[j + 1] - t2[j])*(t2[j + 1] - t2[j])
+					+ (t2[2 * ggen_indx - 1 - j] - t2[2 * ggen_indx - 2 - j])*(t2[2 * ggen_indx - 1 - j] - t2[2 * ggen_indx - 2 - j]));
+			}
+			ll += ll;
+			ll += sqrt(2 * (t2[ggen_indx] - t2[ggen_indx - 1])*(t2[ggen_indx] - t2[ggen_indx - 1]));
+			//store the objective function
+			ggen[i].opt=a/ll;
 		}
 		//sort ggen
-		qsort( (void *)ggen, ggen_size, sizeof(gen314), compareD);
+		qsort((void *)ggen, ggen_size, sizeof(gen314), compareD);
 
-		cout << "Finished" << endl;
+		cout << setprecision(12) << ggen[0].opt << " Finished" << endl;
 	}
 	return 0;
 
