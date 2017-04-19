@@ -1,12 +1,18 @@
 // p314_genetic.cpp : Defines the entry point for the console application.
-//
+
+/*
+Leefter Yao and William A.Sethares;
+Nonlinear Parameter Estimation via the Genetic Algorithm
+IEEE Transactions on Signal Processing, vol 42, no. 42, April 1994}
+*/
 
 #include "stdafx.h"
 
 using namespace std;
 
-const int ggen_size = 30000;
+const int ggen_size = 100;
 const int ggen_indx = 19;
+double maxSo = 132.52;
 
 struct gen314 {
 	double opt;
@@ -53,8 +59,8 @@ int main()
 			int t1[ggen_indx];
 			for (int j = 0; j < ggen_size; j++)
 			{
-				//t1[0] = pr8() / 2;
-				for (int k = 0; k < 7; k++)
+				t1[0] = pr8() / 3;
+				for (int k = 1; k < 7; k++)
 				{
 					t1[k] = pr8()/3 + t1[k - 1];
 				}
@@ -80,12 +86,14 @@ int main()
 			t2[2 * ggen_indx - 2] = 250;
 			t2[2 * ggen_indx - 1] = 250;
 			//compute the objective function
+			//  compute the area
 			double a = 0;
 			for (int j = 0; j < 2*ggen_indx-2; j++)
 			{
 				a += (t2[j + 1] - t2[j])*(t2[2*ggen_indx-1-j] + t2[2*ggen_indx-2-j]);
 			}
 			a /= 2;
+			//  compute the length
 			double ll = 0;
 			for (int j = 0; j < ggen_indx-1; j++)
 			{
@@ -99,8 +107,18 @@ int main()
 		}
 		//sort ggen
 		qsort((void *)ggen, ggen_size, sizeof(gen314), compareD);
+		//cout << setprecision(12) << ggen[0].opt << " Finished" << endl;
+		if (ggen[0].opt > maxSo)
+		{
+			maxSo = ggen[0].opt;
+			cout << setprecision(12) << ggen[0].opt << " ";
+			for (int k = 0; k < ggen_indx - 3; k++)
+			{
+				cout << setw(2) << ggen[0].xy[k] << ", ";
+			}
 
-		cout << setprecision(12) << ggen[0].opt << " Finished" << endl;
+			cout << ggen[0].xy[ggen_indx - 2] << endl;
+		}
 	}
 	return 0;
 

@@ -18,7 +18,7 @@ unsigned short pr8()
 	const unsigned short r0 = 0;
 	const unsigned short s0 = 0;
 	const unsigned short m0 = 15;
-	const unsigned short b = 87;// must be odd
+	const unsigned short b = 9;// must be odd
 	const unsigned short m = 181;// m mod 4 = 1
 	unsigned short t1;
 
