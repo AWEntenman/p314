@@ -10,16 +10,18 @@ using namespace std;
 
 unsigned short pr8()
 {
+#define c0 2000
+#define r0 0
+#define s0 0
+#define m0 15
+#define b  161 //must be an odd number
+#define m  181 // m mod 4 = 1
+
 	static unsigned short S[256];
-	static unsigned short r = 0;
-	static unsigned short s = 0;
+	static unsigned short r;
+	static unsigned short s;
 	static bool started = false;
-	const int c0 = 2000;
-	const unsigned short r0 = 0;
-	const unsigned short s0 = 0;
-	const unsigned short m0 = 15;
-	const unsigned short b = 9;// must be odd
-	const unsigned short m = 181;// m mod 4 = 1
+
 	unsigned short t1;
 
 	if (!started) {
@@ -42,7 +44,7 @@ unsigned short pr8()
 		}
 		started = true;
 	}
-	//compute the next pr byte
+	//compute the next PR byte using the RC4 encryption algorithm
 	r = (r + 1) & 0xff;
 	s = (s + S[r]) & 0xff;
 	t1 = S[s];
