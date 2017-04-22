@@ -8,7 +8,7 @@ IEEE Transactions on Signal Processing, vol 42, no. 42, April 1994}
 
 using namespace std;
 
-#define N         250  //Size of gene pool
+#define N         1000  //Size of gene pool
 #define D         60   //Number of parents
 #define Le        15   //Number of generations with no improvement for extinction
 #define Lt        100  //Number of generations for convergence
@@ -61,14 +61,18 @@ int compareI(const void *i, const void *j) {
 
 int main()
 {
-	//compute the area/perimeter ratio for all edges
+	// *********************************************************************************
+	//
+	// Create the initial population
+	//
+	// *********************************************************************************
 	for (int i = 0; i < ggen_size; i++)
 	{
 		int t1[ggen_indx];
 		int t2[2 * ggen_indx];
 		double a = 0;
 		double ll = 0;
-		srand(12345);
+		//srand(12345);
 		//populate ggen
 		{
 			for (int j = 0; j < ggen_size; j++)
@@ -131,6 +135,14 @@ int main()
 
 	for (; ;)
 	{
+		// *********************************************************************************
+		//
+		// The main iterative loop here.
+		//
+		// *********************************************************************************
+		int k_loop = 0; //counter to check for no improvement in 1 generation
+		int m_loop = 0; //counter to check if a solution has been found.
+
 		//Build the next generation from D parents,
 		// copy best D parents to tgenn for mating
 		for (int i = 0; i < D; i++)
@@ -326,11 +338,76 @@ int main()
 			//store the objective function
 			ggen[i + 1].opt = a / ll;
 		}
-		// quick sort ggen
+		// quick sort the next generation
 		qsort((void *)ggen, ggen_size, sizeof(gen314), compareD);
 
-		//tgen[i + 1] = ggen[s];
-		//copy(begin(tgen), end(tgen), begin(ggen));
+		if (ggen[0].opt == ggen[ggen_size-1].opt)
+		{
+			for (int i = 2; i < ggen_size; i++)
+			{
+				int t1[ggen_indx];
+				int t2[2 * ggen_indx];
+				double a = 0;
+				double ll = 0;
+				//srand(12345);
+				//populate ggen
+				{
+					for (int j = 0; j < ggen_size; j++)
+					{
+						t1[0] = pr8() / 4;
+						//t1[0] = rand() / 4;
+						for (int k = 1; k < 7; k++)
+						{
+							t1[k] = pr8() / 2 + t1[k - 1];
+							//t1[k] = rand() / 2 + t1[k - 1];
+						}
+						for (int k = 7; k < ggen_indx; k++)
+						{
+							t1[k] = pr8() + t1[k - 1];
+							//t1[k] = rand() + t1[k - 1];
+						}
+						for (int k = 0; k < ggen_indx; k++)
+						{
+							t1[k] = t1[k] * (xyList - 1);
+							t1[k] = t1[k] / t1[ggen_indx - 1];
+						}
+					}
+					copy(begin(t1), end(t1), begin(ggen[i].xy));
+				}
+				//Build the coefficient list
+				{
+					for (int j = 1; j < ggen_indx; j++)
+					{
+						t2[j] = xy[t1[j - 1]][0];
+						t2[2 * ggen_indx - 1 - j] = xy[t1[j - 1]][1];
+					}
+					t2[0] = 0;
+					t2[2 * ggen_indx - 2] = 250;
+					t2[2 * ggen_indx - 1] = 250;
+				}//compute the objective function
+				 //  compute the area
+				{
+					for (int j = 0; j < 2 * ggen_indx - 2; j++)
+					{
+						a += (t2[j + 1] - t2[j])*(t2[2 * ggen_indx - 1 - j] + t2[2 * ggen_indx - 2 - j]);
+					}
+					a /= 2;
+				}
+				//  compute the length
+				{
+					for (int j = 0; j < ggen_indx - 1; j++)
+					{
+						ll += sqrt((t2[j + 1] - t2[j])*(t2[j + 1] - t2[j])
+							+ (t2[2 * ggen_indx - 1 - j] - t2[2 * ggen_indx - 2 - j])*(t2[2 * ggen_indx - 1 - j] - t2[2 * ggen_indx - 2 - j]));
+					}
+					ll += ll;
+					ll += sqrt(2 * (t2[ggen_indx] - t2[ggen_indx - 1])*(t2[ggen_indx] - t2[ggen_indx - 1]));
+				}
+				//store the objective function
+				ggen[i].opt = a / ll;
+			}
+			qsort((void *)ggen, ggen_size, sizeof(gen314), compareD);
+		}
 
 		//Display ggen
 		if (ggen[0].opt > maxSo)
